@@ -57,7 +57,7 @@ jobs:
         run: |
           New-Item -ItemType Directory out | Out-Null
           Get-ChildItem src/bin -Recurse -Include *.zip,*.7z | Copy-Item -Destination out
-          Get-ChildItem out | ForEach-Object { "{0}  {1}" -f (Get-FileHash $_ -Algorithm SHA256).Hash.ToLower(), $_.Name } | Set-Content out/SHA256SUMS.txt
+          Get-ChildItem out | ForEach-Object { "{0}  {1}" -f (Get-FileHash $_ -Algorithm SHA256).Hash.ToLower(), $_.Name } | Join-String -Separator "`n" | Set-Content -NoNewline out/SHA256SUMS.txt
           Get-Content out/SHA256SUMS.txt
           $commit = git -C src rev-parse HEAD
           "COMMIT=$commit" | Out-File -Append $env:GITHUB_ENV
