@@ -57,6 +57,8 @@ jobs:
         run: |
           New-Item -ItemType Directory out | Out-Null
           Get-ChildItem src/bin -Recurse -Include *.zip,*.7z | Copy-Item -Destination out
+          # Nomes sem espaço/parênteses (o GitHub renomeia assets assim; SHA256SUMS precisa bater).
+          Get-ChildItem out | ForEach-Object { Rename-Item $_ (($_.Name -replace '[ ()]+', '.') -replace '\.+', '.' -replace '\.zip$', '.zip') }
           Get-ChildItem out | ForEach-Object { "{0}  {1}" -f (Get-FileHash $_ -Algorithm SHA256).Hash.ToLower(), $_.Name } | Join-String -Separator "`n" | Set-Content -NoNewline out/SHA256SUMS.txt
           Get-Content out/SHA256SUMS.txt
           $commit = git -C src rev-parse HEAD
