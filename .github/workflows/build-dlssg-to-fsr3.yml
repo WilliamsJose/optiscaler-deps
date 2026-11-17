@@ -32,6 +32,16 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
+      - name: WinPixEventRuntime (NuGet oficial da Microsoft; o FidelityFX espera em libs/pix/bin)
+        shell: pwsh
+        run: |
+          Invoke-WebRequest "https://www.nuget.org/api/v2/package/WinPixEventRuntime/1.0.240308001" -OutFile pix.zip
+          Expand-Archive pix.zip -DestinationPath pix
+          $dst = "src/dependencies/FidelityFX-SDK/sdk/libs/pix/bin"
+          New-Item -ItemType Directory -Force "$dst/x64" | Out-Null
+          Copy-Item pix/bin/x64/WinPixEventRuntime.dll, pix/bin/x64/WinPixEventRuntime.lib "$dst/x64/"
+          Copy-Item pix/bin/x64/WinPixEventRuntime.dll, pix/bin/x64/WinPixEventRuntime.lib "$dst/"
+          Get-ChildItem -Recurse $dst | Select-Object FullName
       - name: FidelityFX SDK (vendorizado no repositório)
         shell: cmd
         working-directory: src/dependencies
